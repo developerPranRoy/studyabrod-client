@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   createSession,
   deleteSession,
+  getMySessions,
   getSessions,
   registerForSession,
   unregisterFromSession,
@@ -72,4 +73,8 @@ export function useDeleteSession() {
     },
     onError: (error) => toast.error(error.message),
   });
+}
+
+export function useMySessions() {
+  return useQuery({ queryKey: qk.mySessions, queryFn: getMySessions });
 }
