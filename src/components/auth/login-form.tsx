@@ -139,7 +139,7 @@ export function LoginForm() {
         </p>
         <p>
           Want to guide students?{" "}
-          <Link href="/register?role=mentor" className="font-semibold text-brand-600 hover:underline">
+          <Link href="/register/mentor" className="font-semibold text-brand-600 hover:underline">
             Join as a mentor
           </Link>
         </p>

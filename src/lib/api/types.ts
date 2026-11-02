@@ -188,7 +188,10 @@ export interface MentorOnboardingOptions {
 
 export interface MentorMeOnboarding {
   /** Wizard progress + profile strength. */
-  strength: { percent: number };
+  status: "DRAFT" | "LIVE";
+  nextStep: string | null;
+  steps: { key: string; done: boolean }[];
+  strength: { percent: number; done: number; total: number };
 }
 
 export interface MentorMeOverview {

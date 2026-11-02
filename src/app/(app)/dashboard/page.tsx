@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/store/auth-store";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StudentOverview } from "@/components/dashboard/student-overview";
 import { MentorOverview } from "@/components/dashboard/mentor-overview";
+import { useMentorMeOnboarding } from "@/hooks/use-mentor-me";
 
 function greeting() {
   const hour = new Date().getHours();
@@ -14,8 +15,31 @@ function greeting() {
   return "Good Evening";
 }
 
+/** Mentors who haven't completed onboarding get redirected to the wizard. */
+function MentorDashboard() {
+  const router = useRouter();
+  const { data: onboarding, isLoading } = useMentorMeOnboarding(true);
+
+  useEffect(() => {
+    if (!isLoading && onboarding) {
+      // If status is DRAFT (not yet published) redirect to wizard
+      if (onboarding.status === "DRAFT") {
+        router.replace("/mentor-onboarding");
+      }
+    }
+  }, [isLoading, onboarding, router]);
+
+  // Show nothing while checking — avoids flash of wrong content
+  if (isLoading || (onboarding && onboarding.status === "DRAFT")) {
+    return null;
+  }
+
+  return <MentorOverview />;
+}
+
 export default function DashboardPage() {
   const { user, isMentor } = useAuth();
+
   return (
     <div className="space-y-6">
       <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-brand-50 to-white p-6 sm:p-8">
@@ -32,7 +56,7 @@ export default function DashboardPage() {
         </p>
       </Card>
 
-      {isMentor ? <MentorOverview /> : <StudentOverview />}
+      {isMentor ? <MentorDashboard /> : <StudentOverview />}
     </div>
   );
 }

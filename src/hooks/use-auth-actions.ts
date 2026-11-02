@@ -118,8 +118,8 @@ export function useRegisterMentor() {
     onSuccess: ({ token, user }, variables) => {
       setAuth(token, user);
       queryClient.invalidateQueries();
-      toast.success(`Welcome, ${user.fullName.split(" ")[0]}! Start building your profile.`);
-      router.push(variables.next ?? "/dashboard/mentor/profile");
+      toast.success(`Welcome, ${user.fullName.split(" ")[0]}! Let's build your profile.`);
+      router.push(variables.next ?? "/mentor-onboarding");
     },
     onError: (error) => toast.error(error.message),
   });

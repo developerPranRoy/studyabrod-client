@@ -32,7 +32,20 @@ export async function getMentorMeOnboarding(): Promise<MentorMeOnboarding> {
   const res = await api.get<ApiEnvelope<unknown>>("/mentors/me/onboarding");
   const r = isObj(res.data.data) ? res.data.data : {};
   const strength = isObj(r.strength) ? r.strength : {};
-  return { strength: { percent: num(strength.percent) ?? 0 } };
+  const steps = asArray(r.steps, (s) => s).map((s) => ({
+    key: str(isObj(s) ? s.key : null) ?? "",
+    done: Boolean(isObj(s) ? s.done : false),
+  }));
+  return {
+    status: (str(r.status) ?? "DRAFT") as "DRAFT" | "LIVE",
+    nextStep: str(r.nextStep),
+    steps,
+    strength: {
+      percent: num(strength.percent) ?? 0,
+      done: num(strength.done) ?? 0,
+      total: num(strength.total) ?? 0,
+    },
+  };
 }
 
 export async function getMentorMeOverview(): Promise<MentorMeOverview> {

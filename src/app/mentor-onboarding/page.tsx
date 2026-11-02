@@ -86,8 +86,8 @@ function Stepper({ current }: StepperProps) {
                   isCompleted
                     ? "bg-primary border-primary text-primary-foreground"
                     : isCurrent
-                    ? "bg-primary border-primary text-primary-foreground ring-2 ring-primary/30"
-                    : "bg-background border-border text-muted-foreground"
+                      ? "bg-primary border-primary text-primary-foreground ring-2 ring-primary/30"
+                      : "bg-background border-border text-muted-foreground",
                 )}
                 aria-label={`Step ${step}: ${name}`}
                 aria-current={isCurrent ? "step" : undefined}
@@ -97,7 +97,9 @@ function Stepper({ current }: StepperProps) {
               <span
                 className={cn(
                   "mt-1 text-[10px] text-center leading-tight",
-                  isCurrent ? "text-primary font-medium" : "text-muted-foreground"
+                  isCurrent
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground",
                 )}
               >
                 {name}
@@ -203,7 +205,10 @@ function StepSource({
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6 text-center" style={{ fontFamily: "Caveat, cursive" }}>
+      <h2
+        className="text-2xl font-semibold mb-6 text-center"
+        style={{ fontFamily: "Caveat, cursive" }}
+      >
         How did you hear about AbroadMates?
       </h2>
 
@@ -221,7 +226,7 @@ function StepSource({
               "px-4 py-2 rounded-full border-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               selected === s.id
                 ? "bg-pink-50 border-primary text-primary"
-                : "bg-background border-border hover:border-primary/50"
+                : "bg-background border-border hover:border-primary/50",
             )}
             aria-pressed={selected === s.id}
           >
@@ -251,7 +256,10 @@ const profileSchema = z.object({
   middleName: z.string().optional(),
   lastName: z.string().min(1, "Last name is required"),
   nationalityId: z.number({ required_error: "Nationality is required" }),
-  sellingPoint: z.string().min(10, "At least 10 characters").max(500, "Max 500 characters"),
+  sellingPoint: z
+    .string()
+    .min(10, "At least 10 characters")
+    .max(500, "Max 500 characters"),
   phone: z.string().min(1, "Phone is required"),
 });
 
@@ -281,7 +289,7 @@ function StepProfile({
   const nationalityId = watch("nationalityId");
 
   const filteredCountries = (countries ?? []).filter((c) =>
-    c.name.toLowerCase().includes(countrySearch.toLowerCase())
+    c.name.toLowerCase().includes(countrySearch.toLowerCase()),
   );
 
   async function onSubmit(data: ProfileForm) {
@@ -315,7 +323,7 @@ function StepProfile({
             {...register("firstName")}
             className={cn(
               "w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary",
-              errors.firstName ? "border-destructive" : "border-input"
+              errors.firstName ? "border-destructive" : "border-input",
             )}
             autoComplete="given-name"
           />
@@ -327,7 +335,10 @@ function StepProfile({
         </div>
 
         <div>
-          <label htmlFor="middleName" className="block text-sm font-medium mb-1">
+          <label
+            htmlFor="middleName"
+            className="block text-sm font-medium mb-1"
+          >
             Middle Name
           </label>
           <input
@@ -347,7 +358,7 @@ function StepProfile({
             {...register("lastName")}
             className={cn(
               "w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary",
-              errors.lastName ? "border-destructive" : "border-input"
+              errors.lastName ? "border-destructive" : "border-input",
             )}
             autoComplete="family-name"
           />
@@ -368,7 +379,7 @@ function StepProfile({
             type="tel"
             className={cn(
               "w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary",
-              errors.phone ? "border-destructive" : "border-input"
+              errors.phone ? "border-destructive" : "border-input",
             )}
             autoComplete="tel"
           />
@@ -382,7 +393,10 @@ function StepProfile({
 
       {/* Nationality searchable select */}
       <div className="mb-4">
-        <label htmlFor="nationalitySearch" className="block text-sm font-medium mb-1">
+        <label
+          htmlFor="nationalitySearch"
+          className="block text-sm font-medium mb-1"
+        >
           Nationality <span aria-hidden>*</span>
         </label>
         <input
@@ -393,7 +407,7 @@ function StepProfile({
           onChange={(e) => setCountrySearch(e.target.value)}
           className={cn(
             "w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-1",
-            errors.nationalityId ? "border-destructive" : "border-input"
+            errors.nationalityId ? "border-destructive" : "border-input",
           )}
           autoComplete="off"
           aria-label="Search nationality"
@@ -415,14 +429,16 @@ function StepProfile({
                 }}
                 className={cn(
                   "px-3 py-2 text-sm cursor-pointer hover:bg-accent",
-                  nationalityId === c.id && "bg-accent font-medium"
+                  nationalityId === c.id && "bg-accent font-medium",
                 )}
               >
                 {c.name}
               </li>
             ))}
             {filteredCountries.length === 0 && (
-              <li className="px-3 py-2 text-sm text-muted-foreground">No results</li>
+              <li className="px-3 py-2 text-sm text-muted-foreground">
+                No results
+              </li>
             )}
           </ul>
         )}
@@ -440,9 +456,14 @@ function StepProfile({
 
       {/* Selling point */}
       <div className="mb-4">
-        <label htmlFor="sellingPoint" className="block text-sm font-medium mb-1">
+        <label
+          htmlFor="sellingPoint"
+          className="block text-sm font-medium mb-1"
+        >
           Your selling point{" "}
-          <span className="text-muted-foreground font-normal">(10–500 characters)</span>{" "}
+          <span className="text-muted-foreground font-normal">
+            (10–500 characters)
+          </span>{" "}
           <span aria-hidden>*</span>
         </label>
         <textarea
@@ -451,7 +472,7 @@ function StepProfile({
           rows={4}
           className={cn(
             "w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none",
-            errors.sellingPoint ? "border-destructive" : "border-input"
+            errors.sellingPoint ? "border-destructive" : "border-input",
           )}
           placeholder="Tell students why they should book a call with you…"
         />
@@ -493,7 +514,7 @@ function StepExpertise({
 
   function toggle(id: number) {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   }
 
@@ -527,7 +548,7 @@ function StepExpertise({
               "px-4 py-2 rounded-full border-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               selected.includes(t.id)
                 ? "bg-pink-50 border-primary text-primary"
-                : "bg-background border-border hover:border-primary/50"
+                : "bg-background border-border hover:border-primary/50",
             )}
           >
             {selected.includes(t.id) && <span className="mr-1">✓</span>}
@@ -599,12 +620,20 @@ function StepAvailability({
   const [timezone, setTimezone] = useState("");
   const [tzSearch, setTzSearch] = useState("");
   const [schedule, setSchedule] = useState<WeeklySchedule>({
-    1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [],
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+    7: [],
   });
-  const [availableUntilKey, setAvailableUntilKey] = useState<string | null>(null);
+  const [availableUntilKey, setAvailableUntilKey] = useState<string | null>(
+    null,
+  );
 
   const filteredTz = (timezones ?? []).filter((tz) =>
-    tz.toLowerCase().includes(tzSearch.toLowerCase())
+    tz.toLowerCase().includes(tzSearch.toLowerCase()),
   );
 
   function addRange(weekday: number) {
@@ -621,23 +650,65 @@ function StepAvailability({
     }));
   }
 
-  function updateRange(weekday: number, idx: number, field: "start" | "end", value: string) {
+  function updateRange(
+    weekday: number,
+    idx: number,
+    field: "start" | "end",
+    value: string,
+  ) {
     setSchedule((prev) => {
-      const updated = prev[weekday].map((r, i) => (i === idx ? { ...r, [field]: value } : r));
+      const updated = prev[weekday].map((r, i) =>
+        i === idx ? { ...r, [field]: value } : r,
+      );
       return { ...prev, [weekday]: updated };
     });
   }
+
+  const toMinutes = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + m;
+  };
+
+  const hasSlots = Object.values(schedule).some((r) => r.length > 0);
+
+  const rangeErrors: string[] = [];
+  Object.entries(schedule).forEach(([weekday, ranges]) => {
+    ranges.forEach((r, idx) => {
+      if (toMinutes(r.end) <= toMinutes(r.start)) {
+        rangeErrors.push(
+          `${WEEKDAY_LABELS[Number(weekday) - 1]} range ${idx + 1}: end time must be after start time`,
+        );
+      }
+    });
+  });
 
   async function handleContinue() {
     const weekly: MentorMeWeeklySlot[] = Object.entries(schedule)
       .filter(([, ranges]) => ranges.length > 0)
       .map(([weekday, ranges]) => ({
         weekday: Number(weekday),
-        ranges: ranges.map((r): MentorMeAvailabilityRange => ({ start: r.start, end: r.end })),
+        ranges: ranges.map(
+          (r): MentorMeAvailabilityRange => ({ start: r.start, end: r.end }),
+        ),
       }));
 
+    // Availability is optional — if no slots added, skip
+    if (weekly.length === 0) {
+      onContinue();
+      return;
+    }
+
+    // Validate end > start
+    const hasInvalid = weekly.some(({ ranges }) =>
+      ranges.some((r) => toMinutes(r.end) <= toMinutes(r.start))
+    );
+    if (hasInvalid) {
+      alert("One or more time ranges have end time before or equal to start time. Please fix them.");
+      return;
+    }
+
     const input: MentorMeAvailabilityInput = {
-      timezone,
+      timezone: timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
       weekly,
       availableUntil: computeAvailableUntil(availableUntilKey),
     };
@@ -687,14 +758,16 @@ function StepAvailability({
                 }}
                 className={cn(
                   "px-3 py-2 text-sm cursor-pointer hover:bg-accent",
-                  timezone === tz && "bg-accent font-medium"
+                  timezone === tz && "bg-accent font-medium",
                 )}
               >
                 {tz}
               </li>
             ))}
             {filteredTz.length === 0 && (
-              <li className="px-3 py-2 text-sm text-muted-foreground">No results</li>
+              <li className="px-3 py-2 text-sm text-muted-foreground">
+                No results
+              </li>
             )}
           </ul>
         )}
@@ -719,39 +792,59 @@ function StepAvailability({
                   + Add time range
                 </Button>
               </div>
-              {ranges.map((range, idx) => (
-                <div key={idx} className="flex items-center gap-2 mt-2">
-                  <label className="sr-only" htmlFor={`start-${weekday}-${idx}`}>
-                    Start time for {label}
-                  </label>
-                  <input
-                    id={`start-${weekday}-${idx}`}
-                    type="time"
-                    value={range.start}
-                    onChange={(e) => updateRange(weekday, idx, "start", e.target.value)}
-                    className="border border-input rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <span className="text-muted-foreground text-sm">to</span>
-                  <label className="sr-only" htmlFor={`end-${weekday}-${idx}`}>
-                    End time for {label}
-                  </label>
-                  <input
-                    id={`end-${weekday}-${idx}`}
-                    type="time"
-                    value={range.end}
-                    onChange={(e) => updateRange(weekday, idx, "end", e.target.value)}
-                    className="border border-input rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeRange(weekday, idx)}
-                    className="text-destructive text-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive rounded"
-                    aria-label={`Remove time range ${idx + 1} for ${label}`}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
+              {ranges.map((range, idx) => {
+                const invalid = toMinutes(range.end) <= toMinutes(range.start);
+                return (
+                  <div key={idx} className="mt-2">
+                    <div className="flex items-center gap-2">
+                      <label
+                        className="sr-only"
+                        htmlFor={`start-${weekday}-${idx}`}
+                      >
+                        Start time for {label}
+                      </label>
+                      <input
+                        id={`start-${weekday}-${idx}`}
+                        type="time"
+                        value={range.start}
+                        onChange={(e) =>
+                          updateRange(weekday, idx, "start", e.target.value)
+                        }
+                        className={`border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary ${invalid ? "border-destructive" : "border-input"}`}
+                      />
+                      <span className="text-muted-foreground text-sm">to</span>
+                      <label
+                        className="sr-only"
+                        htmlFor={`end-${weekday}-${idx}`}
+                      >
+                        End time for {label}
+                      </label>
+                      <input
+                        id={`end-${weekday}-${idx}`}
+                        type="time"
+                        value={range.end}
+                        onChange={(e) =>
+                          updateRange(weekday, idx, "end", e.target.value)
+                        }
+                        className={`border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary ${invalid ? "border-destructive" : "border-input"}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeRange(weekday, idx)}
+                        className="text-destructive text-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive rounded"
+                        aria-label={`Remove time range ${idx + 1} for ${label}`}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    {invalid && (
+                      <p className="text-destructive text-xs mt-1" role="alert">
+                        End time must be after start time
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           );
         })}
@@ -759,13 +852,18 @@ function StepAvailability({
 
       {/* Available until */}
       <div className="mb-6">
-        <label htmlFor="availableUntil" className="block text-sm font-medium mb-1">
+        <label
+          htmlFor="availableUntil"
+          className="block text-sm font-medium mb-1"
+        >
           Available until
         </label>
         <select
           id="availableUntil"
           value={availableUntilKey ?? ""}
-          onChange={(e) => setAvailableUntilKey(e.target.value === "" ? null : e.target.value)}
+          onChange={(e) =>
+            setAvailableUntilKey(e.target.value === "" ? null : e.target.value)
+          }
           className="w-full border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         >
           {AVAILABLE_UNTIL_OPTIONS.map((o) => (
@@ -780,7 +878,6 @@ function StepAvailability({
         step={step}
         onBack={onBack}
         onContinue={handleContinue}
-        continueDisabled={!timezone}
         continueLoading={mutation.isPending}
       />
     </div>
@@ -817,7 +914,7 @@ function StepPricing({
         marketId: market.id,
         serviceId: service.id,
         price: prices[`${market.id}-${service.id}`] ?? 0,
-      }))
+      })),
     );
     await mutation.mutateAsync({ prices: priceList });
     onContinue();
@@ -842,7 +939,9 @@ function StepPricing({
             <h3 className="font-semibold mb-3">
               {market.name}
               {market.currency && (
-                <span className="ml-2 text-muted-foreground text-sm">({market.currency})</span>
+                <span className="ml-2 text-muted-foreground text-sm">
+                  ({market.currency})
+                </span>
               )}
             </h3>
             <div className="space-y-3">
@@ -870,7 +969,9 @@ function StepPricing({
                       aria-label={`Price for ${service.name} in ${market.name}`}
                     />
                     {market.currency && (
-                      <span className="text-sm text-muted-foreground">{market.currency}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {market.currency}
+                      </span>
                     )}
                   </div>
                 );
@@ -920,7 +1021,8 @@ function StepPreview({
         (str(err.details.code) === "EMAIL_NOT_VERIFIED" ||
           (isObj(err.details) &&
             isObj(err.details.data) &&
-            str((err.details.data as Record<string, unknown>).code) === "EMAIL_NOT_VERIFIED"))
+            str((err.details.data as Record<string, unknown>).code) ===
+              "EMAIL_NOT_VERIFIED"))
       ) {
         setEmailNotVerified(true);
       }
@@ -936,11 +1038,16 @@ function StepPreview({
   }
 
   if (isLoading) {
-    return <p className="text-center text-muted-foreground py-12">Loading preview…</p>;
+    return (
+      <p className="text-center text-muted-foreground py-12">
+        Loading preview…
+      </p>
+    );
   }
 
   const name =
-    [preview?.firstName, preview?.lastName].filter(Boolean).join(" ") || "Your Profile";
+    [preview?.firstName, preview?.lastName].filter(Boolean).join(" ") ||
+    "Your Profile";
 
   return (
     <div>
@@ -979,7 +1086,9 @@ function StepPreview({
         <div className="text-center">
           <p className="text-lg font-semibold">{name}</p>
           {preview?.sellingPoint && (
-            <p className="text-sm text-muted-foreground mt-1 max-w-md">{preview.sellingPoint}</p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-md">
+              {preview.sellingPoint}
+            </p>
           )}
         </div>
       </div>
@@ -1039,11 +1148,7 @@ function StepGrowth({ slug }: { slug?: string | null }) {
         </div>
       )}
 
-      <Button
-        onClick={() => router.push("/dashboard")}
-        size="lg"
-        type="button"
-      >
+      <Button onClick={() => router.push("/dashboard")} size="lg" type="button">
         Go to Dashboard
       </Button>
     </div>
@@ -1057,7 +1162,8 @@ function StepGrowth({ slug }: { slug?: string | null }) {
 export default function MentorOnboardingPage() {
   const router = useRouter();
   const { isAuthenticated, hasHydrated, isMentor } = useAuth();
-  const { data: onboarding, isLoading: onboardingLoading } = useMentorMeOnboarding();
+  const { data: onboarding, isLoading: onboardingLoading } =
+    useMentorMeOnboarding();
   const { data: preview } = useMentorPreview();
 
   const [step, setStep] = useState(1);
@@ -1075,10 +1181,25 @@ export default function MentorOnboardingPage() {
     }
   }, [hasHydrated, isAuthenticated, isMentor, router]);
 
-  // Initialize step from API
+  // Initialize step from API — nextStep is a string key like "source", map it to a step number
   useEffect(() => {
-    if (!initialized && onboarding?.nextStep) {
-      setStep(onboarding.nextStep);
+    if (!initialized && onboarding?.nextStep != null) {
+      const STEP_KEYS = [
+        "source",
+        "profile",
+        "location",
+        "university",
+        "scholarships",
+        "expertise",
+        "availability",
+        "pricing",
+        "payout",
+        "social",
+        "preview",
+        "growth",
+      ];
+      const idx = STEP_KEYS.indexOf(onboarding.nextStep);
+      if (idx >= 0) setStep(idx + 1);
       setInitialized(true);
     }
   }, [initialized, onboarding]);
@@ -1123,15 +1244,9 @@ export default function MentorOnboardingPage() {
         {step === 2 && (
           <StepProfile onContinue={advance} onBack={back} step={step} />
         )}
-        {step === 3 && (
-          <PlaceholderStep onContinue={advance} />
-        )}
-        {step === 4 && (
-          <PlaceholderStep onContinue={advance} />
-        )}
-        {step === 5 && (
-          <PlaceholderStep onContinue={advance} />
-        )}
+        {step === 3 && <PlaceholderStep onContinue={advance} />}
+        {step === 4 && <PlaceholderStep onContinue={advance} />}
+        {step === 5 && <PlaceholderStep onContinue={advance} />}
         {step === 6 && (
           <StepExpertise onContinue={advance} onBack={back} step={step} />
         )}
@@ -1141,18 +1256,12 @@ export default function MentorOnboardingPage() {
         {step === 8 && (
           <StepPricing onContinue={advance} onBack={back} step={step} />
         )}
-        {step === 9 && (
-          <PlaceholderStep onContinue={advance} />
-        )}
-        {step === 10 && (
-          <PlaceholderStep onContinue={advance} />
-        )}
+        {step === 9 && <PlaceholderStep onContinue={advance} />}
+        {step === 10 && <PlaceholderStep onContinue={advance} />}
         {step === 11 && (
           <StepPreview onContinue={advance} onBack={back} step={step} />
         )}
-        {step === 12 && (
-          <StepGrowth slug={preview?.slug} />
-        )}
+        {step === 12 && <StepGrowth slug={preview?.slug} />}
       </main>
     </div>
   );

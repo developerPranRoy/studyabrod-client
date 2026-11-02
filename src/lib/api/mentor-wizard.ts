@@ -10,12 +10,19 @@ import type {
   MentorMeSourceInput,
 } from '@/lib/api/types';
 
-export async function getMentorMeOnboarding(): Promise<MentorMeOnboarding & { nextStep: number }> {
+export async function getMentorMeOnboarding(): Promise<MentorMeOnboarding> {
   const res = await api.get<ApiEnvelope<unknown>>('/mentors/me/onboarding');
   const r = isObj(res.data.data) ? res.data.data : {};
+  const strength = isObj(r.strength) ? r.strength : {};
   return {
-    strength: { percent: num(isObj(r.strength) ? r.strength.percent : r.strength) ?? 0 },
-    nextStep: num(r.nextStep) ?? 1,
+    status: (str(r.status) ?? "DRAFT") as "DRAFT" | "LIVE",
+    nextStep: str(r.nextStep),
+    steps: [],
+    strength: {
+      percent: num(isObj(strength) ? strength.percent : null) ?? 0,
+      done: num(isObj(strength) ? strength.done : null) ?? 0,
+      total: num(isObj(strength) ? strength.total : null) ?? 0,
+    },
   };
 }
 
