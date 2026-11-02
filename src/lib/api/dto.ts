@@ -3,6 +3,7 @@
  * The helpers tolerate small shape differences (nested `user`, snake_case,
  * alternate key names) so the UI never breaks on harmless variations.
  */
+import { assetUrl } from "@/lib/api/asset";
 import type {
   Booking,
   Country,
@@ -129,9 +130,10 @@ export function toMentor(raw: unknown): Mentor {
     fullName: str(r.fullName) ?? (user ? str(user.fullName) : null) ?? "Mentor",
     headline: str(r.headline),
     bio: str(r.bio),
-    photoUrl:
-      str(r.photoUrl) ?? str(r.photo_url) ?? str(r.photo) ?? (user ? str(user.photoUrl) : null),
-    cvUrl: str(r.cvUrl) ?? str(r.cv_url),
+    photoUrl: assetUrl(
+      str(r.photoUrl) ?? str(r.photo_url) ?? str(r.photo) ?? (user ? str(user.photoUrl) : null)
+    ),
+    cvUrl: assetUrl(str(r.cvUrl) ?? str(r.cv_url)),
     universityName: str(r.universityName) ?? str(r.university_name) ?? str(r.university),
     country,
     program,
@@ -172,8 +174,9 @@ export function toBooking(raw: unknown): Booking {
       (mentor ? str(mentor.fullName) : null) ??
       (mentorUser ? str(mentorUser.fullName) : null) ??
       "Mentor",
-    mentorPhotoUrl:
-      str(r.mentorPhotoUrl) ?? (mentor ? str(mentor.photoUrl) : null),
+    mentorPhotoUrl: assetUrl(
+      str(r.mentorPhotoUrl) ?? (mentor ? str(mentor.photoUrl) : null)
+    ),
     mentorHeadline: str(r.mentorHeadline) ?? (mentor ? str(mentor.headline) : null),
   };
 }

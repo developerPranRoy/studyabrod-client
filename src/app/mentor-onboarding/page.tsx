@@ -1071,7 +1071,7 @@ function StepPreview({
         {preview?.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={`${process.env.NEXT_PUBLIC_API_ORIGIN ?? ""}${preview.photoUrl}`}
+            src={preview.photoUrl}
             alt={name}
             className="w-20 h-20 rounded-full object-cover"
           />

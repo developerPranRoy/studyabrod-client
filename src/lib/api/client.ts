@@ -1,10 +1,8 @@
 import axios, { AxiosError } from "axios";
+import { API_URL } from "@/lib/api/config";
 import { useAuthStore } from "@/store/auth-store";
 
-export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1").replace(
-  /\/$/,
-  ""
-);
+export { API_URL };
 
 /** Normalized error thrown by every API call. */
 export class ApiError extends Error {

@@ -1,4 +1,5 @@
 import { api } from '@/lib/api/client';
+import { assetUrl } from '@/lib/api/asset';
 import { isObj, num, str } from '@/lib/api/dto';
 import type {
   ApiEnvelope,
@@ -60,7 +61,7 @@ export async function getMentorPreview(): Promise<{
     firstName: str(r.firstName) ?? str(r.first_name) ?? undefined,
     lastName: str(r.lastName) ?? str(r.last_name) ?? undefined,
     sellingPoint: str(r.sellingPoint) ?? str(r.selling_point) ?? undefined,
-    photoUrl: str(r.photoUrl) ?? str(r.photo_url) ?? null,
+    photoUrl: assetUrl(str(r.photoUrl) ?? str(r.photo_url)),
   };
 }
 

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: studyabrod-client
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Public values are baked into the bundle at BUILD time. Change them here
+      # (or in the Render dashboard) and trigger a new build, not just a restart.
+      - key: NEXT_PUBLIC_API_URL
+        value: https://studyabrode.onrender.com/api/v1
+      - key: NEXT_PUBLIC_API_ORIGIN
+        value: https://studyabrode.onrender.com
+      - key: NEXT_PUBLIC_GOOGLE_CLIENT_ID
+        value: 848735645394-kq42pur9c29qra0g4sc2cqp6rbbqd1bk.apps.googleusercontent.com
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://studyabrod-client.onrender.com
+      - key: NEXT_PUBLIC_TURNSTILE_SITE_KEY
+        value: ""
