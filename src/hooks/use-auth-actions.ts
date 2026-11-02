@@ -63,9 +63,9 @@ export function useRegister() {
         acceptTerms: input.acceptTerms,
         onboarding: input.onboarding,
       }),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Check your email to verify your account");
-      router.push("/login?verify=1");
+      router.push(`/verify-email-sent?email=${encodeURIComponent(data.email)}`);
     },
     onError: (error) => toast.error(error.message),
   });

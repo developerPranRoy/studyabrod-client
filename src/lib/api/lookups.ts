@@ -147,6 +147,14 @@ function toMentorOnboardingOptions(raw: unknown): MentorOnboardingOptions {
   };
 }
 
+/** Countries filtered by region IDs — optionally only those with mentors. */
+export async function getCountriesByRegion(regionIds: number[], withMentors?: boolean): Promise<Country[]> {
+  const res = await api.get<ApiEnvelope<unknown[]>>('/lookups/countries', {
+    params: { regionIds: regionIds.join(','), withMentors: withMentors ? 'true' : undefined },
+  });
+  return asArray(res.data.data, (c) => c).map(toCountry).filter((c): c is Country => c !== null);
+}
+
 function toTimezoneNames(raw: unknown): string[] {
   if (Array.isArray(raw)) {
     return raw.filter((v): v is string => typeof v === "string");

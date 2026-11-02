@@ -1,7 +1,5 @@
 "use client";
-
-import { RegisterForm } from "@/components/auth/register-form";
-
+import { StudentWizard } from "@/components/onboarding/student-wizard";
 export default function RegisterPage() {
-  return <RegisterForm />;
+  return <StudentWizard />;
 }

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getAllCountries,
   getCountries,
+  getCountriesByRegion,
   getCountry,
   getMentorOnboardingOptions,
   getOnboardingOptions,
@@ -112,6 +113,15 @@ export function useAllCountries() {
   return useQuery({
     queryKey: qk.allCountries,
     queryFn: getAllCountries,
+    staleTime: LOOKUP_STALE,
+  });
+}
+
+export function useCountriesByRegion(regionIds: number[]) {
+  return useQuery({
+    queryKey: ['lookups', 'countries', 'by-region', regionIds],
+    queryFn: () => getCountriesByRegion(regionIds, true),
+    enabled: regionIds.length > 0,
     staleTime: LOOKUP_STALE,
   });
 }
