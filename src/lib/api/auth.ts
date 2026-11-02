@@ -81,3 +81,15 @@ export async function loginWithGoogle(input: { idToken: string }): Promise<AuthP
   });
   return toAuthPayload(res.data.data);
 }
+
+export async function forgotPassword(input: { email: string }): Promise<void> {
+  await api.post('/auth/forgot-password', input);
+}
+
+export async function resetPassword(input: { token: string; password: string }): Promise<void> {
+  await api.post('/auth/reset-password', input);
+}
+
+export async function resendVerification(input: { email: string }): Promise<void> {
+  await api.post('/auth/resend-verification', input);
+}
