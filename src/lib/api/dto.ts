@@ -1,8 +1,3 @@
-/**
- * DTO normalizers — map the backend's JSON into stable frontend types.
- * The helpers tolerate small shape differences (nested `user`, snake_case,
- * alternate key names) so the UI never breaks on harmless variations.
- */
 import { assetUrl } from "@/lib/api/asset";
 import type {
   Booking,
@@ -87,7 +82,6 @@ export function toPlan(raw: unknown): MentorPlan | null {
   return { id: num(raw.id) ?? 0, durationMin, price };
 }
 
-/** Universities endpoint may return `["MIT", …]` or `[{ name: "MIT" }, …]`. */
 export function toUniversityNames(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   return raw
@@ -201,7 +195,6 @@ export function toSession(raw: unknown): GroupSession {
   };
 }
 
-// ------------------------------------------------- lookups: services / categories / markets ----
 export function toService(raw: unknown): Service | null {
   if (!isObj(raw)) return null;
   const id = num(raw.id);

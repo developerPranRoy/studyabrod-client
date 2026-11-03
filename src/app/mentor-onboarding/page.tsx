@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
@@ -33,9 +34,6 @@ import type {
   MentorMeAvailabilityRange,
 } from "@/lib/api/types";
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
 
 const STEP_NAMES = [
   "Source",
@@ -56,23 +54,18 @@ const TOTAL_STEPS = 12;
 
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-// ---------------------------------------------------------------------------
-// Stepper
-// ---------------------------------------------------------------------------
 
 interface StepperProps {
-  current: number; // 1-based
+  current: number;
 }
 
 function Stepper({ current }: StepperProps) {
   return (
     <>
-      {/* Mobile */}
       <div className="sm:hidden px-4 py-3 text-sm font-medium text-muted-foreground">
         Step {current} of {TOTAL_STEPS}: {STEP_NAMES[current - 1]}
       </div>
 
-      {/* Desktop */}
       <div className="hidden sm:flex items-start justify-center gap-1 px-4 py-6 overflow-x-auto">
         {STEP_NAMES.map((name, i) => {
           const step = i + 1;
@@ -112,9 +105,6 @@ function Stepper({ current }: StepperProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Wizard footer
-// ---------------------------------------------------------------------------
 
 interface FooterProps {
   step: number;
@@ -156,9 +146,6 @@ function WizardFooter({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Placeholder step
-// ---------------------------------------------------------------------------
 
 function PlaceholderStep({ onContinue }: { onContinue: () => void }) {
   return (
@@ -173,9 +160,6 @@ function PlaceholderStep({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Step 1: Source
-// ---------------------------------------------------------------------------
 
 function StepSource({
   onContinue,
@@ -191,16 +175,17 @@ function StepSource({
   const mutation = usePutMentorSource();
   const [selected, setSelected] = useState<number | null>(null);
 
-  // sources come from the student onboarding options
   const sources = onbOpts?.sources ?? [];
 
   async function handleContinue() {
     if (selected == null) return;
-    await mutation.mutateAsync({ sourceId: selected });
-    onContinue();
+    try {
+      await mutation.mutateAsync({ sourceId: selected });
+      onContinue();
+    } catch {
+    }
   }
 
-  // suppress unused warning — opts only needed indirectly
   void opts;
 
   return (
@@ -247,9 +232,6 @@ function StepSource({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Step 2: Profile
-// ---------------------------------------------------------------------------
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -258,9 +240,13 @@ const profileSchema = z.object({
   nationalityId: z.number({ required_error: "Nationality is required" }),
   sellingPoint: z
     .string()
+    .trim()
     .min(10, "At least 10 characters")
     .max(500, "Max 500 characters"),
-  phone: z.string().min(1, "Phone is required"),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+?[0-9 ]{6,20}$/, "Enter a valid phone number (6–20 digits)"),
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
@@ -293,15 +279,18 @@ function StepProfile({
   );
 
   async function onSubmit(data: ProfileForm) {
-    await mutation.mutateAsync({
-      firstName: data.firstName,
-      middleName: data.middleName,
-      lastName: data.lastName,
-      nationalityId: data.nationalityId,
-      sellingPoint: data.sellingPoint,
-      phone: data.phone,
-    });
-    onContinue();
+    try {
+      await mutation.mutateAsync({
+        firstName: data.firstName,
+        middleName: data.middleName,
+        lastName: data.lastName,
+        nationalityId: data.nationalityId,
+        sellingPoint: data.sellingPoint,
+        phone: data.phone,
+      });
+      onContinue();
+    } catch {
+    }
   }
 
   return (
@@ -391,7 +380,6 @@ function StepProfile({
         </div>
       </div>
 
-      {/* Nationality searchable select */}
       <div className="mb-4">
         <label
           htmlFor="nationalitySearch"
@@ -454,7 +442,6 @@ function StepProfile({
         )}
       </div>
 
-      {/* Selling point */}
       <div className="mb-4">
         <label
           htmlFor="sellingPoint"
@@ -493,9 +480,6 @@ function StepProfile({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Step 6: Expertise
-// ---------------------------------------------------------------------------
 
 function StepExpertise({
   onContinue,
@@ -520,8 +504,11 @@ function StepExpertise({
 
   async function handleContinue() {
     if (selected.length === 0) return;
-    await mutation.mutateAsync({ helpTopicIds: selected });
-    onContinue();
+    try {
+      await mutation.mutateAsync({ helpTopicIds: selected });
+      onContinue();
+    } catch {
+    }
   }
 
   return (
@@ -574,19 +561,17 @@ function StepExpertise({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Step 7: Availability
-// ---------------------------------------------------------------------------
 
 interface TimeRange {
   start: string;
   end: string;
 }
 
-type WeeklySchedule = Record<number, TimeRange[]>; // weekday 1-7 => ranges
+type WeeklySchedule = Record<number, TimeRange[]>;
 
 const AVAILABLE_UNTIL_OPTIONS: { label: string; value: string | null }[] = [
   { label: "Indefinitely", value: null },
+  { label: "1 month", value: "1month" },
   { label: "3 months", value: "3months" },
   { label: "6 months", value: "6months" },
   { label: "1 year", value: "1year" },
@@ -595,14 +580,16 @@ const AVAILABLE_UNTIL_OPTIONS: { label: string; value: string | null }[] = [
 function computeAvailableUntil(choice: string | null): string | null {
   if (choice === null) return null;
   const now = new Date();
-  if (choice === "3months") {
+  if (choice === "1month") {
+    now.setMonth(now.getMonth() + 1);
+  } else if (choice === "3months") {
     now.setMonth(now.getMonth() + 3);
   } else if (choice === "6months") {
     now.setMonth(now.getMonth() + 6);
   } else if (choice === "1year") {
     now.setFullYear(now.getFullYear() + 1);
   }
-  return now.toISOString();
+  return now.toISOString().slice(0, 10);
 }
 
 function StepAvailability({
@@ -686,19 +673,17 @@ function StepAvailability({
     const weekly: MentorMeWeeklySlot[] = Object.entries(schedule)
       .filter(([, ranges]) => ranges.length > 0)
       .map(([weekday, ranges]) => ({
-        weekday: Number(weekday),
+        weekday: Number(weekday) % 7,
         ranges: ranges.map(
           (r): MentorMeAvailabilityRange => ({ start: r.start, end: r.end }),
         ),
       }));
 
-    // Availability is optional — if no slots added, skip
     if (weekly.length === 0) {
       onContinue();
       return;
     }
 
-    // Validate end > start
     const hasInvalid = weekly.some(({ ranges }) =>
       ranges.some((r) => toMinutes(r.end) <= toMinutes(r.start))
     );
@@ -713,8 +698,11 @@ function StepAvailability({
       availableUntil: computeAvailableUntil(availableUntilKey),
     };
 
-    await mutation.mutateAsync(input);
-    onContinue();
+    try {
+      await mutation.mutateAsync(input);
+      onContinue();
+    } catch {
+    }
   }
 
   return (
@@ -726,7 +714,6 @@ function StepAvailability({
         When are you available?
       </h2>
 
-      {/* Timezone */}
       <div className="mb-6">
         <label htmlFor="tzSearch" className="block text-sm font-medium mb-1">
           Timezone <span aria-hidden>*</span>
@@ -773,7 +760,6 @@ function StepAvailability({
         )}
       </div>
 
-      {/* Weekly schedule */}
       <div className="mb-6 space-y-3">
         <p className="text-sm font-medium">Weekly Schedule</p>
         {WEEKDAY_LABELS.map((label, i) => {
@@ -850,7 +836,6 @@ function StepAvailability({
         })}
       </div>
 
-      {/* Available until */}
       <div className="mb-6">
         <label
           htmlFor="availableUntil"
@@ -884,9 +869,6 @@ function StepAvailability({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Step 8: Pricing
-// ---------------------------------------------------------------------------
 
 function StepPricing({
   onContinue,
@@ -901,7 +883,6 @@ function StepPricing({
   const { data: services } = useServices();
   const mutation = usePutMentorPricing();
 
-  // keyed by `${marketId}-${serviceId}` => price
   const [prices, setPrices] = useState<Record<string, number>>({});
 
   function setPrice(marketId: number, serviceId: number, value: number) {
@@ -909,15 +890,26 @@ function StepPricing({
   }
 
   async function handleContinue() {
-    const priceList = (markets ?? []).flatMap((market) =>
-      (services ?? []).map((service) => ({
-        marketId: market.id,
-        serviceId: service.id,
-        price: prices[`${market.id}-${service.id}`] ?? 0,
-      })),
-    );
-    await mutation.mutateAsync({ prices: priceList });
-    onContinue();
+    const priceList = (markets ?? [])
+      .flatMap((market) =>
+        (services ?? []).map((service) => ({
+          marketId: market.id,
+          serviceId: service.id,
+          price: Number(prices[`${market.id}-${service.id}`] ?? 0),
+        })),
+      )
+      .filter((row) => Number.isFinite(row.price) && row.price > 0);
+
+    if (priceList.length === 0) {
+      toast.error("Enter a price for at least one call type.");
+      return;
+    }
+
+    try {
+      await mutation.mutateAsync({ prices: priceList });
+      onContinue();
+    } catch {
+    }
   }
 
   return (
@@ -991,9 +983,6 @@ function StepPricing({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Step 11: Preview / Publish
-// ---------------------------------------------------------------------------
 
 function StepPreview({
   onContinue,
@@ -1069,7 +1058,6 @@ function StepPreview({
 
       <div className="border border-border rounded-xl p-6 mb-6 flex flex-col items-center gap-3">
         {preview?.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={preview.photoUrl}
             alt={name}
@@ -1110,9 +1098,6 @@ function StepPreview({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Step 12: Growth / Confetti
-// ---------------------------------------------------------------------------
 
 function StepGrowth({ slug }: { slug?: string | null }) {
   const router = useRouter();
@@ -1155,9 +1140,6 @@ function StepGrowth({ slug }: { slug?: string | null }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main Page
-// ---------------------------------------------------------------------------
 
 export default function MentorOnboardingPage() {
   const router = useRouter();
@@ -1169,7 +1151,6 @@ export default function MentorOnboardingPage() {
   const [step, setStep] = useState(1);
   const [initialized, setInitialized] = useState(false);
 
-  // Auth guard
   useEffect(() => {
     if (!hasHydrated) return;
     if (!isAuthenticated) {
@@ -1181,7 +1162,6 @@ export default function MentorOnboardingPage() {
     }
   }, [hasHydrated, isAuthenticated, isMentor, router]);
 
-  // Initialize step from API — nextStep is a string key like "source", map it to a step number
   useEffect(() => {
     if (!initialized && onboarding?.nextStep != null) {
       const STEP_KEYS = [
@@ -1224,7 +1204,6 @@ export default function MentorOnboardingPage() {
     <div className="min-h-screen bg-background">
       <Stepper current={step} />
 
-      {/* Progress bar */}
       <div className="w-full h-1 bg-border">
         <div
           className="h-1 bg-primary transition-all"

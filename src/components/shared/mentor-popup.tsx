@@ -3,56 +3,78 @@
 import { useEffect, useState } from "react";
 import { X, ArrowRight } from "lucide-react";
 import { SearchWizard } from "@/components/shared/search-wizard";
+import { PersonBust, type HairStyle } from "@/components/shared/person-bust";
+import { portrait } from "@/components/shared/portraits";
 
-/* ─── Stacked mentor photo cards (fan shape) ────────────────────────────────── */
 const FAN_CARDS = [
-  { rotate: -18, translateX: -70, translateY: 10,  zIndex: 1, bg: "#1a6b8a" },
-  { rotate: -8,  translateX: -35, translateY: 0,   zIndex: 2, bg: "#7c3aed" },
-  { rotate:  0,  translateX:   0, translateY: -8,  zIndex: 5, bg: "#C1113F" },
-  { rotate:  8,  translateX:  35, translateY: 0,   zIndex: 2, bg: "#065f46" },
-  { rotate:  18, translateX:  70, translateY: 10,  zIndex: 1, bg: "#b45309" },
+  { rotate: -26, tx: -104, ty: 16, w: 76, h: 96, zIndex: 1, bg: "#C1113F", hair: "long" as HairStyle, photo: 8 },
+  { rotate: -13, tx: -54, ty: 4, w: 84, h: 106, zIndex: 2, bg: "#E9A33C", hair: "bun" as HairStyle, photo: 9 },
+  { rotate: 0, tx: 0, ty: -10, w: 104, h: 130, zIndex: 5, bg: "#E9A33C", hair: "long" as HairStyle, photo: 10 },
+  { rotate: 13, tx: 54, ty: 4, w: 84, h: 106, zIndex: 2, bg: "#E9A33C", hair: "short" as HairStyle, photo: 11 },
+  { rotate: 26, tx: 104, ty: 16, w: 76, h: 96, zIndex: 1, bg: "#C1113F", hair: "cap" as HairStyle, photo: 12 },
 ];
 
 function FanCard({
-  rotate, translateX, translateY, zIndex, bg,
+  rotate,
+  tx,
+  ty,
+  w,
+  h,
+  zIndex,
+  bg,
+  hair,
+  photo,
 }: (typeof FAN_CARDS)[number]) {
+  const dark = bg === "#C1113F";
+  const [failed, setFailed] = useState(false);
+
   return (
     <div
-      aria-hidden
+      aria-hidden="true"
       style={{
         position: "absolute",
-        width: 72,
-        height: 90,
-        borderRadius: 14,
+        width: w,
+        height: h,
+        borderRadius: 16,
         background: bg,
-        transform: `rotate(${rotate}deg) translateX(${translateX}px) translateY(${translateY}px)`,
+        border: "2px solid rgba(255,255,255,0.85)",
+        transform: `translate(${tx}px, ${ty}px) rotate(${rotate}deg)`,
+        transformOrigin: "50% 135%",
         zIndex,
         overflow: "hidden",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.35)",
+        boxShadow: "0 8px 22px rgba(0,0,0,0.32)",
       }}
     >
-      {/* Person silhouette placeholder */}
-      <svg
-        viewBox="0 0 72 90"
-        style={{ position: "absolute", bottom: 0, width: "100%", height: "100%" }}
-        fill="rgba(255,255,255,0.22)"
-        preserveAspectRatio="xMidYMax meet"
-      >
-        <circle cx="36" cy="26" r="16" />
-        <rect x="28" y="39" width="16" height="10" rx="4" />
-        <path d="M0,90 L0,65 Q0,50 36,44 Q72,50 72,65 L72,90 Z" />
-      </svg>
+      {failed ? (
+        <PersonBust
+          hair={hair}
+          fill={dark ? "rgba(255,255,255,0.30)" : "rgba(255,255,255,0.42)"}
+          hairFill={dark ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.68)"}
+        />
+      ) : (
+        <img
+          src={portrait(photo)}
+          alt=""
+          onError={() => setFailed(true)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center 22%",
+          }}
+        />
+      )}
     </div>
   );
 }
 
-/* ─── Main popup ─────────────────────────────────────────────────────────────── */
 export function MentorPopup() {
-  const [visible,    setVisible]    = useState(false);
-  const [dismissed,  setDismissed]  = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
 
-  /* Auto-open after 10 s, only once per session */
   useEffect(() => {
     const already = sessionStorage.getItem("mentor-popup-dismissed");
     if (already) return;
@@ -76,13 +98,10 @@ export function MentorPopup() {
 
   return (
     <>
-      {/* SearchWizard opened from "Get Started" */}
       {showWizard && <SearchWizard onClose={() => setShowWizard(false)} />}
 
-      {/* Popup */}
       {visible && (
         <>
-          {/* Backdrop */}
           <div
             onClick={dismiss}
             style={{
@@ -94,34 +113,34 @@ export function MentorPopup() {
             }}
           />
 
-          {/* Modal card */}
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Find Your Perfect Mentor"
             style={{
               position: "fixed",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 201,
-              width: "min(420px, 92vw)",
+              width: "min(440px, 92vw)",
               borderRadius: 24,
-              background: "#C1113F",
-              padding: "2rem 2rem 1.75rem",
+              background: "#E4002B",
+              padding: "2.25rem 2rem 2rem",
               textAlign: "center",
-              boxShadow: "0 32px 80px rgba(0,0,0,0.35)",
+              boxShadow: "0 32px 80px rgba(0,0,0,0.4)",
             }}
           >
-            {/* Close button */}
             <button
               onClick={dismiss}
               aria-label="Close"
               style={{
                 position: "absolute",
-                top: 14,
-                right: 14,
+                top: 16,
+                right: 16,
                 width: 32,
                 height: 32,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.2)",
+                background: "none",
                 border: "none",
                 cursor: "pointer",
                 display: "flex",
@@ -130,18 +149,18 @@ export function MentorPopup() {
                 color: "#fff",
               }}
             >
-              <X style={{ width: 16, height: 16 }} />
+              <X style={{ width: 22, height: 22 }} />
             </button>
 
-            {/* Fan of mentor photo cards */}
             <div
+              aria-hidden="true"
               style={{
                 position: "relative",
-                height: 110,
+                height: 168,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                marginBottom: "1.5rem",
+                marginBottom: "1.25rem",
               }}
             >
               {FAN_CARDS.map((card, i) => (
@@ -149,11 +168,10 @@ export function MentorPopup() {
               ))}
             </div>
 
-            {/* Heading */}
             <h2
               style={{
                 color: "#fff",
-                fontSize: "1.5rem",
+                fontSize: "1.65rem",
                 fontWeight: 800,
                 margin: 0,
                 lineHeight: 1.2,
@@ -162,68 +180,65 @@ export function MentorPopup() {
               Find Your Perfect Mentor
             </h2>
 
-            {/* Subtext */}
             <p
               style={{
-                color: "rgba(255,255,255,0.85)",
-                fontSize: "0.9rem",
+                color: "rgba(255,255,255,0.92)",
+                fontSize: "0.95rem",
                 lineHeight: 1.55,
-                margin: "0.75rem 0 0",
+                margin: "0.8rem 0 0",
               }}
             >
-              Answer a few quick questions to get personalized mentor recommendations
-              for your study abroad journey.
+              Answer a few quick questions to get personalized mentor
+              recommendations for your study abroad journey.
             </p>
 
-            {/* Get Started button — amber/yellow */}
             <button
               onClick={getStarted}
               style={{
-                marginTop: "1.5rem",
+                marginTop: "1.6rem",
                 width: "100%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
-                background: "#f59e0b",
+                background: "#E9A33C",
                 color: "#fff",
                 border: "none",
-                borderRadius: 999,
-                padding: "0.9rem 1.5rem",
-                fontSize: "1rem",
+                borderRadius: 14,
+                padding: "1rem 1.5rem",
+                fontSize: "1.05rem",
                 fontWeight: 700,
                 cursor: "pointer",
-                boxShadow: "0 4px 16px rgba(245,158,11,0.4)",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.22)",
                 transition: "background 0.15s",
               }}
             >
               Get Started
-              <ArrowRight style={{ width: 18, height: 18 }} />
+              <ArrowRight style={{ width: 20, height: 20 }} />
             </button>
 
-            {/* Maybe later */}
             <button
               onClick={dismiss}
               style={{
-                marginTop: "0.9rem",
+                marginTop: "1rem",
                 background: "none",
                 border: "none",
-                color: "rgba(255,255,255,0.85)",
-                fontSize: "0.9rem",
+                color: "#fff",
+                fontSize: "0.98rem",
                 cursor: "pointer",
-                fontWeight: 500,
+                fontWeight: 700,
                 padding: "0.25rem",
               }}
             >
               Maybe later
             </button>
 
-            {/* Trust line */}
             <p
               style={{
-                marginTop: "0.85rem",
-                color: "rgba(255,255,255,0.6)",
-                fontSize: "0.78rem",
+                marginTop: "0.9rem",
+                color: "rgba(255,255,255,0.85)",
+                fontSize: "0.8rem",
+                fontWeight: 700,
               }}
             >
               Trusted by 10,000+ students worldwide

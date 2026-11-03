@@ -73,6 +73,9 @@ function VerifyEmailContent() {
               <Link href="/login">Go to login</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-full">
+              <Link href="/verify-email-sent">Resend verification email</Link>
+            </Button>
+            <Button asChild variant="ghost" size="lg" className="rounded-full">
               <Link href="/register">Create a new account</Link>
             </Button>
           </div>

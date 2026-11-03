@@ -12,6 +12,7 @@ import {
   putMentorSource,
 } from '@/lib/api/mentor-wizard';
 import { qk } from '@/hooks/query-keys';
+import { apiErrorMessage } from '@/lib/api/client';
 import type {
   MentorMeAvailabilityInput,
   MentorMeExpertiseInput,
@@ -37,7 +38,7 @@ export function usePutMentorSource() {
   return useMutation({
     mutationFn: (input: MentorMeSourceInput) => putMentorSource(input),
     onSuccess: () => { invalidate(); toast.success('Saved'); },
-    onError: (e) => toast.error(e.message),
+    onError: (e) => toast.error(apiErrorMessage(e)),
   });
 }
 
@@ -46,7 +47,7 @@ export function usePutMentorProfile() {
   return useMutation({
     mutationFn: (input: MentorMeProfileInput) => putMentorProfile(input),
     onSuccess: () => { invalidate(); toast.success('Profile saved'); },
-    onError: (e) => toast.error(e.message),
+    onError: (e) => toast.error(apiErrorMessage(e)),
   });
 }
 
@@ -55,7 +56,7 @@ export function usePutMentorExpertise() {
   return useMutation({
     mutationFn: (input: MentorMeExpertiseInput) => putMentorExpertise(input),
     onSuccess: () => { invalidate(); toast.success('Expertise saved'); },
-    onError: (e) => toast.error(e.message),
+    onError: (e) => toast.error(apiErrorMessage(e)),
   });
 }
 
@@ -64,7 +65,7 @@ export function usePutMentorAvailability() {
   return useMutation({
     mutationFn: (input: MentorMeAvailabilityInput) => putMentorAvailability(input),
     onSuccess: () => { invalidate(); toast.success('Availability saved'); },
-    onError: (e) => toast.error(e.message),
+    onError: (e) => toast.error(apiErrorMessage(e)),
   });
 }
 
@@ -73,7 +74,7 @@ export function usePutMentorPricing() {
   return useMutation({
     mutationFn: (input: MentorMePricingInput) => putMentorPricing(input),
     onSuccess: () => { invalidate(); toast.success('Pricing saved'); },
-    onError: (e) => toast.error(e.message),
+    onError: (e) => toast.error(apiErrorMessage(e)),
   });
 }
 
@@ -93,6 +94,6 @@ export function usePublishMentor() {
       qc.invalidateQueries({ queryKey: qk.mentorMePreview });
       toast.success('Profile published!');
     },
-    onError: (e) => toast.error(e.message),
+    onError: (e) => toast.error(apiErrorMessage(e)),
   });
 }

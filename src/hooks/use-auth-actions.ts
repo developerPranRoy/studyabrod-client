@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getMe, login, loginWithGoogle, register, registerMentor } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/client";
 import { qk } from "@/hooks/query-keys";
 import { useAuthStore } from "@/store/auth-store";
 import type { Role } from "@/lib/api/types";
@@ -36,7 +37,18 @@ export function useLogin() {
       toast.success(`Welcome back, ${user.fullName.split(" ")[0]}!`);
       router.push(variables.next ?? (user.role === "MENTOR" ? "/dashboard" : "/mentors"));
     },
-    onError: (error) => toast.error(error.message),
+    onError: (error, variables) => {
+      if (error instanceof ApiError && error.status === 403 && error.code === "EMAIL_NOT_VERIFIED") {
+        toast.error("Please verify your email before logging in.", {
+          action: {
+            label: "Resend",
+            onClick: () => router.push(`/verify-email-sent?email=${encodeURIComponent(variables.email)}`),
+          },
+        });
+        return;
+      }
+      toast.error(error.message);
+    },
   });
 }
 
@@ -67,7 +79,15 @@ export function useRegister() {
       toast.success("Check your email to verify your account");
       router.push(`/verify-email-sent?email=${encodeURIComponent(data.email)}`);
     },
-    onError: (error) => toast.error(error.message),
+    onError: (error) => {
+      if (error instanceof ApiError && error.status === 409) {
+        toast.error("This email is already registered.", {
+          action: { label: "Log in", onClick: () => router.push("/login") },
+        });
+        return;
+      }
+      toast.error(error.message);
+    },
   });
 }
 
@@ -100,7 +120,6 @@ export function useGoogleLogin() {
   });
 }
 
-/** Mentor sign-up returns a login token straight away, so the wizard can begin. */
 export function useRegisterMentor() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const router = useRouter();
